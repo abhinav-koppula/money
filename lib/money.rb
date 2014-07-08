@@ -1,53 +1,81 @@
-#Class Money would perform calculations for given amounts
+#Addition and subtraction of money value
 class Money
-  attr_accessor :rupees ,:paise
-  def initialize(rupees, paise)
+  attr_reader :rupees, :paisa
+
+  def initialize rupees, paisa
     @rupees = rupees
-    @paise = paise
+    @paisa = paisa
+
   end
 
-  def eq(other)
-    self == other
-  end
-
-  def hash
-    [@rupees, @paise].hash
+  def <=>(amount)
+    self.convert_to_paise <=> amount.convert_to_paise
   end
 
   def == amount
-    [@rupees,@paise] == [amount.rupees,amount.paise]
-  end
 
-  def convert_to_paise()
-    paise = @rupees*100 + @paise
-  end
+    if (self.equal? amount)
+      true
 
-  def convert_to_money(paise)
-    if paise<0
-    Money.new(paise/100 + 1, paise % 100)
+    elsif (!(self.class == amount.class))
+      false
+
     else
-      Money.new(paise/100, paise % 100)
+      @rupees == amount.rupees && @paisa == amount.paisa
+      true
+
     end
   end
 
-  def + (amount)
-    converted_paise1 = self.convert_to_paise()
 
-    converted_paise2 = amount.convert_to_paise()
-
-    sum_paise = converted_paise1 + converted_paise2
-
-    convert_to_money(sum_paise)
+  def hash
+    [@rupees, @paisa].hash * 19
   end
 
-  def - (amount)
-    converted_paise1 = self.convert_to_paise()
 
-    converted_paise2 = amount.convert_to_paise()
+  def + amount
+    sum_rupees = @rupees + amount.rupees
+    sum_paisa = @paisa + amount.paisa
+    if sum_paisa >= 100
+      sum_paisa = sum_paisa - 100
+      sum_rupees = sum_rupees + 1
+    end
 
-    difference_paise = converted_paise1 - converted_paise2
-
-    convert_to_money(difference_paise)
+    Money.new(sum_rupees, sum_paisa)
   end
 
+  def - amount
+    total_paisa = (@rupees *
+        100 +
+        @paisa) -
+        (amount.rupees *
+            100 +
+            amount.paisa)
+    Money.new(total_paisa/100, total_paisa%100)
+  end
+
+  def eql amount
+    self == amount
+  end
+  def to_s
+
+    if @rupees > 1
+      string_rupee = "Rupees"
+    else
+      string_rupee = "Rupee"
+    end
+
+
+    if @paisa > 1
+      string_paisa = "Paise"
+    else
+      string_paisa = "Paisa"
+    end
+
+    "#{@rupees} #{string_rupee} and #{@paisa} #{string_paisa}"
+  end
+
+  def convert_to_paise
+    @rupees * 100 + @paisa
+  end
 end
